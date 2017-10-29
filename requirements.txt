@@ -5,3 +5,4 @@ keras
 matplotlib
 gym
 gym[all]
+scikit-image
