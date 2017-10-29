@@ -4,3 +4,4 @@ tensorflow
 keras
 matplotlib
 gym
+gym[all]
