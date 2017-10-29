@@ -16,22 +16,22 @@ for _ in range(1000):
 
 
 class DQN():
-    def __init__(self, FRAME_WIDTH=84, FRAME_HEIGHT=84, STATE_LENGTH=4, num_actions=1):
-        self.frame_width = FRAME_WIDTH
-        self.frame_height = FRAME_HEIGHT
-        self.state_length = STATE_LENGTH
+    def __init__(self, frame_width=84, frame_height=84, state_7=4, num_actions=1):
+        self.frame_width = frame_width
+        self.frame_height = frame_height
+        self.state_length = state_length
         self.num_actions = num_actions
 
     def preprocess(observation, last_observation):
         processed_observation = np.maximum(observation, last_observation)
         processed_observation = np.uint8(
-            resize(rgb2gray(processed_observation), (FRAME_WIDTH, FRAME_HEIGHT)) * 255)
-        return np.reshape(processed_observation, (1, FRAME_WIDTH, FRAME_HEIGHT))
+            resize(rgb2gray(processed_observation), (self.frame_width, self.frame_height)) * 255)
+        return np.reshape(processed_observation, (1, self.frame_width, self.frame_height))
 
     def network():
         model = Sequential()
         model.add(Convolution2D(32, 8, 8, subsample=(4, 4), activation='relu',
-                                input_shape=(STATE_LENGTH, FRAME_WIDTH, FRAME_HEIGHT)))
+                                input_shape=(self.state_length, self.frame_width, self.frame_height)))
         model.add(Convolution2D(64, 4, 4, subsample=(2, 2), activation='relu'))
         model.add(Convolution2D(64, 3, 3, subsample=(1, 1), activation='relu'))
         model.add(Flatten())
@@ -39,7 +39,7 @@ class DQN():
         model.add(Dense(self.num_actions))
 
         s = tf.placeholder(
-            tf.float32, [None, STATE_LENGTH, FRAME_WIDTH, FRAME_HEIGHT])
+            tf.float32, [None, self.state_length, self.frame_width, self.frame_height])
         q_values = model(s)
 
         return s, q_values, model
