@@ -5,6 +5,8 @@ from keras.layers import Dense, Dropout, Convolution2D, Flatten
 from keras.optimizers import Adam
 import tensorflow as tf
 import gym
+from skimage.color import rgb2gray
+from skimage.transform import resize
 
 env = gym.make('Breakout-v0')
 env.reset()
