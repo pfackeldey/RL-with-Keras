@@ -29,7 +29,7 @@ class Agent(object):
         self.state_length = 4
 
         self.init_replay_size = 20000
-        self.target_update_interval_INTERVAL = 10000
+        self.target_update_interval = 10000
         self.save_interval = 300000
 
         self.num_actions = num_actions
@@ -187,7 +187,7 @@ class Agent(object):
             # Debug
             if self.t < self.init_replay_size:
                 mode = 'random'
-            elif self.init_replay_size <= self.t < self.init_replay_size + EXPLORATION_STEPS:
+            elif self.init_replay_size <= self.t < self.init_replay_size + 1000000:
                 mode = 'explore'
             else:
                 mode = 'exploit'
