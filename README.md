@@ -9,3 +9,5 @@ To install all necessary packages run:
 ```sh
 sudo pip install -r requirements.txt
 ```
+
+In order to visualize training do: `tensorboard --logdir==summary/` and open the link in your browser.
