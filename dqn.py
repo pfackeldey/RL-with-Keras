@@ -23,10 +23,12 @@ MIN_GRAD = 0.01
 
 
 class Agent(object):
-    def __init__(self, num_actions):
+    def __init__(self, num_actions, use_gpu):
         self.frame_width = 84  # Resized frame width
         self.frame_height = 84
         self.state_length = 4
+
+        self.use_gpu = use_gpu
 
         self.init_replay_size = 20000
         self.target_update_interval = 10000
@@ -84,14 +86,15 @@ class Agent(object):
         self.sess.run(self.update_target_network)
 
     def build_network(self):
-        model = Sequential()
-        model.add(Conv2D(32, (8, 8), strides=(4, 4), activation='relu',
-                         input_shape=(self.state_length, self.frame_width, self.frame_height)))
-        model.add(Conv2D(64, (4, 4), strides=(2, 2), activation='relu'))
-        model.add(Conv2D(64, (3, 3), strides=(1, 1), activation='relu'))
-        model.add(Flatten())
-        model.add(Dense(512, activation='relu'))
-        model.add(Dense(self.num_actions))
+        with tf.device('/gpu:0' if self.use_gpu else '/cpu:0'):
+            model = Sequential()
+            model.add(Conv2D(32, (8, 8), strides=(4, 4), activation='relu',
+                             input_shape=(self.state_length, self.frame_width, self.frame_height)))
+            model.add(Conv2D(64, (4, 4), strides=(2, 2), activation='relu'))
+            model.add(Conv2D(64, (3, 3), strides=(1, 1), activation='relu'))
+            model.add(Flatten())
+            model.add(Dense(512, activation='relu'))
+            model.add(Dense(self.num_actions))
 
         s = tf.placeholder(
             tf.float32, [None, self.state_length, self.frame_width, self.frame_height])
@@ -295,11 +298,15 @@ def main():
 
     parser.add_argument("--train", default=False, action='store_true',
                         help="Perform training; Else testing. [Default: %(default)s]")
+    parser.add_argument("--gpu", default=False, action='store_true',
+                        help="Perform training with gpu. [Default: %(default)s]")
+    parser.add_argument("--watch-agent-train", default=False, action='store_true',
+                        help="Watch the agent train; CAUTION: Slows down training significantly. [Default: %(default)s]")
 
     args = parser.parse_args()
 
     env = gym.make('Breakout-v0')
-    agent = Agent(num_actions=env.action_space.n)
+    agent = Agent(num_actions=env.action_space.n, use_gpu=args.gpu)
 
     if args.train:  # Train mode
         for _ in range(1200):
@@ -313,7 +320,7 @@ def main():
                 last_observation = observation
                 action = agent.get_action(state)
                 observation, reward, terminal, _ = env.step(action)
-                # env.render()
+                env.render() if args.watch_agent_train else None
                 processed_observation = preprocess(
                     observation, last_observation)
                 state = agent.run(state, action, reward,
