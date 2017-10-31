@@ -7,6 +7,7 @@ Reinforced Learning with Keras
 To install all necessary packages run:
 
 ```sh
+sudo apt install python python-pip make cmake --yes
 sudo pip install -r requirements.txt
 ```
 
